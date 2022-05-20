@@ -1,0 +1,30 @@
+.gallery {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-top: 60px;
+}
+
+.photo-card {
+  width: calc(100% / 4 - 20px);
+  margin: 10px;
+  //   box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.2);
+}
+
+.photo-card__img {
+  display: block;
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.info-item {
+  text-align: center;
+}
