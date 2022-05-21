@@ -3,23 +3,37 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-import fetchSearch from './js/fetchSearch';
+import ImageApiService from './js/fetchSearch.js';
 import './sass/main.scss';
 
 const refs = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
+  endSearchInfo: document.querySelector('.end-search__info'),
 };
-const { form, gallery } = refs;
+const { form, gallery, loadMoreBtn, endSearchInfo } = refs;
 
+const imageApiService = new ImageApiService();
+
+// Добавяем листенеры
 form.addEventListener('submit', handleSearch);
+loadMoreBtn.addEventListener('click', loadMore);
+
+let shownImages = 0;
+
+// Инициализация глобальной переменной SimpleLightbox
+let lightbox = {};
 
 function handleSearch(event) {
   event.preventDefault();
   resetGallery();
+  imageApiService.resetPage();
 
-  const inputValue = form.elements.searchQuery.value;
-  fetchSearch(inputValue)
+  imageApiService.query = form.elements.searchQuery.value;
+
+  imageApiService
+    .fetchQuery()
     .then(data => {
       if (data.totalHits === 0) {
         return Notify.failure(
@@ -27,19 +41,45 @@ function handleSearch(event) {
         );
       }
 
-      gallery.insertAdjacentHTML('beforeend', generateCardMurkup(data.hits));
+      Notify.success(`Hooray! We found ${data.totalHits} images.`);
 
-      new SimpleLightbox('.gallery a', {
-        showCounter: false,
-        captionsData: 'alt',
-        captionDelay: 250,
-      });
+      loadMoreBtn.classList.remove('is-hidden');
+      endSearchInfo.classList.add('is-hidden');
+      shownImages = data.hits.length;
+
+      appendCardsMurkup(data.hits);
+      addLightbox();
+
+      if (shownImages >= data.totalHits) {
+        showEndSearchMessage();
+      }
     })
+
     .catch(error => console.log(error));
 }
 
-function generateCardMurkup(cardArray) {
-  return cardArray
+function loadMore() {
+  imageApiService
+    .fetchQuery()
+    .then(data => {
+      appendCardsMurkup(data.hits);
+      smoothRendering();
+
+      lightbox.refresh();
+
+      shownImages += data.hits.length;
+      if (shownImages >= data.totalHits) {
+        showEndSearchMessage();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      showEndSearchMessage();
+    });
+}
+
+function generateCardsMurkup(cardsArray) {
+  return cardsArray
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
       return `<a href="${largeImageURL}" class="photo-card">
         <img src="${webformatURL}" alt="${tags}" class="photo-card__img" loading="lazy" />
@@ -56,4 +96,33 @@ function generateCardMurkup(cardArray) {
 
 function resetGallery() {
   gallery.innerHTML = '';
+}
+
+function appendCardsMurkup(cards) {
+  gallery.insertAdjacentHTML('beforeend', generateCardsMurkup(cards));
+}
+
+function addLightbox() {
+  lightbox = new SimpleLightbox('.gallery a', {
+    showCounter: false,
+    captionsData: 'alt',
+    captionDelay: 250,
+  });
+}
+
+// Прокрутка страницы при Load more
+function smoothRendering() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+}
+
+function showEndSearchMessage() {
+  loadMoreBtn.classList.add('is-hidden');
+  endSearchInfo.classList.remove('is-hidden');
 }

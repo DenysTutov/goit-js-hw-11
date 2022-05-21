@@ -41,4 +41,10 @@
   padding: 0px 0px 2px 0px;
   border: none;
   cursor: pointer;
+
+  background-color: #f1eff1;
+
+  &:hover {
+    background-color: #e2e2e2;
+  }
 }

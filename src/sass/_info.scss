@@ -1,0 +1,12 @@
+.end-search__info {
+  text-align: center;
+  color: #d2d2d2;
+  font-size: 20px;
+
+  margin-top: 25px;
+  margin-bottom: 25px;
+
+  &.is-hidden {
+    display: none;
+  }
+}

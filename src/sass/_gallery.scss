@@ -28,3 +28,24 @@
 .info-item {
   text-align: center;
 }
+
+.load-more {
+  display: block;
+  margin: 25px auto;
+  border-radius: 3px;
+  text-transform: uppercase;
+
+  padding: 0 30px;
+  height: 30px;
+
+  border: 0;
+  background-color: #f1eff1;
+
+  &:hover {
+    background-color: #e2e2e2;
+  }
+
+  &.is-hidden {
+    display: none;
+  }
+}
