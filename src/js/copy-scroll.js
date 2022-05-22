@@ -23,7 +23,7 @@ form.addEventListener('submit', onSearch);
 let shownImages = 0;
 let lightbox = {};
 
-async function onSearch(event) {
+function onSearch(event) {
   event.preventDefault();
 
   resetGallery();
@@ -32,33 +32,32 @@ async function onSearch(event) {
   hideEndSearchMessage();
   hideLoading();
 
-  imageApiService.query = form.elements.searchQuery.value.trim();
+  imageApiService.query = event.currentTarget.elements.searchQuery.value;
 
-  try {
-    const data = await imageApiService.fetchQuery();
+  imageApiService
+    .fetchQuery()
+    .then(data => {
+      if (data.totalHits === 0) {
+        return Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.',
+        );
+      }
 
-    if (data.totalHits === 0) {
-      return Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.',
-      );
-    }
+      shownImages = data.hits.length;
 
-    shownImages = data.hits.length;
+      Notify.success(`Hooray! We found ${data.totalHits} images.`);
 
-    Notify.success(`Hooray! We found ${data.totalHits} images.`);
+      appendCardsMurkup(data.hits);
+      addLightbox();
 
-    appendCardsMurkup(data.hits);
-    addLightbox();
+      // Add scroll listener
+      window.addEventListener('scroll', scrollAndLoading);
 
-    // Add scroll listener
-    window.addEventListener('scroll', scrollAndLoading);
-
-    if (shownImages === data.totalHits) {
-      hideLoading();
-    }
-  } catch (error) {
-    console.log(error);
-  }
+      if (shownImages === data.totalHits) {
+        hideLoading();
+      }
+    })
+    .catch(error => console.log(error));
 }
 
 function scrollAndLoading() {
@@ -85,21 +84,23 @@ function hideLoading() {
   loading.classList.remove('show');
 }
 
-async function loadMore() {
-  try {
-    const data = await imageApiService.fetchQuery();
-    appendCardsMurkup(data.hits);
-    smoothRendering();
+function loadMore() {
+  imageApiService
+    .fetchQuery()
+    .then(data => {
+      appendCardsMurkup(data.hits);
+      smoothRendering();
 
-    lightbox.refresh();
+      lightbox.refresh();
 
-    shownImages += data.hits.length;
-    if (shownImages >= data.totalHits) {
-      showEndSearchMessage();
-    }
-  } catch (error) {
-    console.log(error);
-  }
+      shownImages += data.hits.length;
+      if (shownImages >= data.totalHits) {
+        showEndSearchMessage();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
 }
 
 function generateCardsMurkup(cardsArray) {
@@ -142,7 +143,7 @@ function smoothRendering() {
     .firstElementChild.getBoundingClientRect();
 
   window.scrollBy({
-    top: cardHeight * 2.3,
+    top: cardHeight * 2,
     behavior: 'smooth',
   });
 }
