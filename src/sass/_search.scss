@@ -4,14 +4,18 @@
   align-items: center;
 
   height: 60px;
-  background-color: #4056b4;
+}
 
+.search-form__background {
   position: fixed;
+  height: 60px;
   width: 100%;
+
+  background-color: #4056b4;
 }
 
 .search-form {
-  position: relative;
+  position: fixed;
 }
 
 .input {
@@ -31,14 +35,18 @@
   top: 0;
   right: 0;
 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   width: 30px;
   height: 100%;
-  font-size: 17px;
+  // font-size: 17px;
 
   border-radius: 0px 3px 3px 0px;
 
   margin: 0;
-  padding: 0px 0px 2px 0px;
+  padding: 0;
   border: none;
   cursor: pointer;
 
@@ -47,4 +55,9 @@
   &:hover {
     background-color: #e2e2e2;
   }
+}
+
+.search__img {
+  width: 22px;
+  height: 22px;
 }

@@ -12,7 +12,7 @@ const refs = {
   endSearchInfo: document.querySelector('.end-search__info'),
   loading: document.querySelector('.loading'),
 };
-const { form, gallery, endSearchInfo, loading } = refs;
+const { form, gallery, endSearchInfo, loading, overlay } = refs;
 
 const imageApiService = new ImageApiService();
 
@@ -106,7 +106,7 @@ function generateCardsMurkup(cardsArray) {
   return cardsArray
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
       return `<a href="${largeImageURL}" class="photo-card">
-        <img src="${webformatURL}" alt="${tags}" class="photo-card__img" loading="lazy" />
+        <img src="${webformatURL}" alt="${tags}" class="photo-card__img" width="400" loading="lazy" />
         <div class="info">
           <p class="info-item"><b>Likes</b><br />${likes}</p>
           <p class="info-item"><b>Views</b><br />${views}</p>
@@ -142,7 +142,7 @@ function smoothRendering() {
     .firstElementChild.getBoundingClientRect();
 
   window.scrollBy({
-    top: cardHeight * 2.3,
+    top: cardHeight * 2,
     behavior: 'smooth',
   });
 }
