@@ -40,12 +40,17 @@ async function onSearch(event) {
     if (data.totalHits === 0) {
       return Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.',
+        {
+          position: 'left-top',
+        },
       );
     }
 
     shownImages = data.hits.length;
 
-    Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    Notify.success(`Hooray! We found ${data.totalHits} images.`, {
+      position: 'left-top',
+    });
 
     appendCardsMurkup(data.hits);
     addLightbox();
